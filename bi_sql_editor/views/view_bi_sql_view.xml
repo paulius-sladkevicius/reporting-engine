@@ -94,6 +94,7 @@ License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
                                     <field name="is_group_by" attrs="{'invisible': [('field_description', '=', False)]}"/>
                                     <field name="graph_type" attrs="{'invisible': [('field_description', '=', False)]}"/>
                                     <field name="tree_visibility" attrs="{'invisible': [('field_description', '=', False)]}"/>
+                                    <field name="field_context" attrs="{'invisible': [('field_description', '=', False)]}"/>
                                 </tree>
                             </field>
                         </page>

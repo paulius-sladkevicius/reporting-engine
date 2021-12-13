@@ -101,6 +101,13 @@ class BiSQLViewField(models.Model):
         help="For 'Many2one' Odoo field.\n"
         " Comodel of the field.")
 
+    field_context = fields.Char(
+        string="Field Context",
+        default="{}",
+        help="Context that will be used for this field"
+        " in all the related views. Take care to escape double quote char"
+        " and other reserved xml char.")
+
     # Constrains Section
     @api.constrains('is_index')
     @api.multi
@@ -118,7 +125,6 @@ class BiSQLViewField(models.Model):
                 sql_field.bi_sql_view_id.view_name, sql_field.name)
 
     # Overload Section
-    @api.multi
     def create(self, vals):
         field_without_prefix = vals['name'][2:]
         # guess field description
@@ -191,9 +197,11 @@ class BiSQLViewField(models.Model):
         self.ensure_one()
         res = ''
         if self.field_description and self.tree_visibility != 'unavailable':
-            res = """<field name="{}" {}/>""".format(
+            res = """<field name="{}" {} context="{}"/>""".format(
                 self.name,
-                self.tree_visibility == 'hidden' and 'invisible="1"' or '')
+                self.tree_visibility == 'hidden' and 'invisible="1"' or '',
+                self.field_context,
+            )
         return res
 
     @api.multi
@@ -201,17 +209,19 @@ class BiSQLViewField(models.Model):
         self.ensure_one()
         res = ''
         if self.graph_type and self.field_description:
-            res = """<field name="{}" type="{}" />""".format(
-                self.name, self.graph_type)
+            res = """<field name="{}" type="{}" context="{}" />\n""".format(
+                self.name, self.graph_type, self.field_context)
         return res
 
     @api.multi
     def _prepare_pivot_field(self):
         self.ensure_one()
         res = ''
-        if self.graph_type and self.field_description:
-            res = """<field name="{}" type="{}" />""".format(
-                self.name, self.graph_type)
+        if self.field_description:
+            graph_type_text =\
+                self.graph_type and "type=\"%s\"" % (self.graph_type) or ""
+            res = """<field name="{}" {} context="{}"/>\n""".format(
+                self.name, graph_type_text, self.field_context)
         return res
 
     @api.multi
@@ -219,7 +229,8 @@ class BiSQLViewField(models.Model):
         self.ensure_one()
         res = ''
         if self.field_description:
-            res = """<field name="{}"/>""".format(self.name)
+            res = """<field name="{}" context="{}"/>\n""".format(
+                self.name, self.field_context)
         return res
 
     @api.multi
@@ -232,5 +243,4 @@ class BiSQLViewField(models.Model):
                         context="{'group_by':'%s'}"/>""" % (
                     self.field_description.lower().replace(' ', '_'),
                     self.field_description, self.name
-                )
         return res
