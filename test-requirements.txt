@@ -1,0 +1,2 @@
+git+https://github.com/legalsylvain/reporting-engine@16.0-mig-sql_request_abstract#subdirectory=setup/sql_request_abstract
+git+https://github.com/legalsylvain/reporting-engine@16.0-mig-sql_export#subdirectory=setup/sql_export
